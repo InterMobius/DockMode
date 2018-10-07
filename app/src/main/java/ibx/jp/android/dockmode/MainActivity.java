@@ -1,10 +1,15 @@
 package ibx.jp.android.dockmode;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.os.Bundle;
 import android.content.Intent;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.support.v7.app.AppCompatActivity;
+
+import android.os.Process;
 
 import processing.android.PFragment;
 import processing.android.CompatUtils;
@@ -39,6 +44,31 @@ public class MainActivity extends AppCompatActivity {
     public void onNewIntent(Intent intent) {
         if (sketch != null) {
             sketch.onNewIntent(intent);
+        }
+    }
+
+    /**
+     * 電源接続時にインテントを自動起動するクラス。
+     *
+     * 編集中。
+     */
+    public class PowerReceiver extends BroadcastReceiver {
+        public void onReceive(Context context, Intent intent) {
+            String TAG = "BroadcastReceiver";
+            if (intent != null) {
+                if ( Intent.ACTION_POWER_CONNECTED.equals(intent.getAction()) ) {
+                    // 電源接続時に行う処理。
+                    Log.d(TAG, "Power connected.");
+                    Intent i = new Intent(context, MainActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(i);
+
+                } else if ( Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction()) ) {
+                    // 電源切断時に行う処理。
+                    Log.d(TAG, "Power disconnected.");
+                    finish();
+                }
+            }
         }
     }
 }
